@@ -1,0 +1,64 @@
+html {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    font-size: 18px;
+}
+
+p {
+    margin: 5px;
+}
+
+a, .name {
+    text-decoration: none;
+    color: hotpink;
+    font-weight: bold;
+}
+.function {
+    padding: 10px;
+    border: 1px solid hotpink;
+}
+
+.function .name, .blue {
+    color: mediumslateblue;
+}
+
+.small {
+    font-size: 16px;
+    font-weight: normal;
+}
+
+h1 {
+    font-size: 26px;
+}
+
+div {
+    margin: 10px 0;
+}
+
+#list a {
+    display: block;
+}
+
+.row {
+    display: flex;
+}
+
+#list {
+   white-space: nowrap;
+}
+
+.left {
+    flex: 25%;
+    border-right: 1px solid hotpink;
+    overflow-y: scroll;
+    overflow-x: scroll;
+    height: 80vh;
+}
+
+.right {
+    padding-left: 10px;
+    flex: 75%;
+    overflow-y: scroll;
+    height: 80vh;
+}

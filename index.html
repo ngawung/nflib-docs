@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>NightFox Lib Docs</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="style.css" rel="stylesheet">
+    </head>
+    <body>
+        <h1>NightFox Lib Docs</h1>
+
+        <div class="row">
+            <div class="left">
+                <div id="list"></div>
+            </div>
+            
+            <div class="right">
+                <div class="block">
+                    <a class="name">#include “nf_basic.h”</a>
+        
+                    <div class="function">
+                        <a class="name">Function 1</a>
+        
+                        <p>some code here</p>
+                    </div>
+        
+                    <div class="function">
+                        <a class="name">Funcasdas dasdasda sdasdasdti on 2</a>
+        
+                        <p>some code here</p>
+                    </div>
+        
+                    <div class="function">
+                        <a class="name">Functiosadasd asdasdas jdhasud huasdn 3</a>
+        
+                        <p>some code here</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <script src="docs.js"></script>
+
+        <script>
+            document.querySelectorAll(".block").forEach(data => {
+                var list = document.getElementById("list")
+                var div = document.createElement("div")
+
+                var tag = document.createElement("a")
+                tag.innerHTML = data.querySelector(".name").innerHTML
+                tag.onclick = () => {
+                    data.scrollIntoView()
+                }
+                div.append(tag)
+                
+                data.querySelectorAll(".function").forEach(res => {
+                    var func = document.createElement("a")
+                    func.className = "blue"
+                    func.innerHTML = " - " + res.querySelector(".name").innerHTML
+                    func.onclick = () => {
+                        res.scrollIntoView()
+                    }
+                    div.append(func)
+                })
+
+                list.append(div)
+            });
+        </script>
+    </body>
+</html>
