@@ -17,7 +17,35 @@ const docs = [
 				description: `Generates a error and stops program execution, showing on the screen the error.<br>This command it’s internaly used by the lib to generate debug messages and rarely will<br>be used in you code.`,
 				example: `NF_Error(112, “Sprite”, 37);`,
 				example_description: `Generates a error with code 112, with the text “sprite” as description and a value of 37.`
-			}
+			},
+			{
+				name: "NF_SetRootFolder",
+				function: `void NF_SetRootFolder( \n    const char* folder   // Name of your root folder\n);`,
+				description: `Defines the root folder of your project then inits the filesystem (FAT or NitroFS).<br>This makes easy change the name of folder that contains all files of your project after<br>it’s compiled. It’s imperative the use of this function before load any file from FAT.<br>If you want to use NitroFS, use “NITROFS” as root folder name. You must copy the right<br>MAKEFILE on the root of your project to enable NitroFS usage. Also you has to put all<br>files you want to load in “nitrofiles” folder.`,
+				example: `NF_SetRootFolder(“mygame”);`,
+				example_description: `Define “mygame” folder as root for your project, using FAT.<br><br>If you flashcard don’t supports ARGV, use Homebrew Menu to launch the ROM.`
+			},
+			{
+				name: "NF_DmaMemCopy",
+				function: `void NF_DmaMemCopy(   \n    void* destination,    // Destination pointer\n    const void* source,   // Source pointer\n    u32 size              // Number of bytes to copy\n);`,
+				description: `Function to fast copy blocks of memory from RAM to VRAM (because it’s the kind of copy<br>where DMA copy it’s most effective). The function checks if data it’s aligned for DMA<br>copy, if not, uses memcpy(); command insead.`,
+				example: `NF_DmaMemCopy((void*)0x06000000, buffer, 131072);`,
+				example_description: `Copy to 0x06000000 memory adress of VRAM (Bank A), 131072 bytes of memory (128kb) from<br>“buffer” pointer on RAM.`
+			},
+			{
+				name: "NF_GetLanguage",
+				function: `u8 NF_GetLanguage(void);`,
+				description: ``,
+				example: ``,
+				example_description: `Returns the user language ID.<br>0 : Japanese<br>1 : English<br>2 : French<br>3 : German<br>4 : Italian<br>5 : Spanish<br>6 : Chinese`
+			},
+			{
+				name: "",
+				function: ``,
+				description: ``,
+				example: ``,
+				example_description: ``
+			},
 		]
 	}
 ]
@@ -86,16 +114,18 @@ document.querySelector("#docs").childNodes.forEach(data => {
 		data.scrollIntoView()
 	}
 	div.append(tag)
-	
-	data.querySelectorAll(".function").forEach(res => {
-		const func = document.createElement("a")
-		func.className = "blue small"
-		func.innerHTML = " -- " + res.querySelector(".name").innerHTML
-		func.onclick = () => {
-			res.scrollIntoView()
-		}
-		div.append(func)
-	})
+
+	if (data.querySelector(".function")) {
+		data.querySelector(".function").childNodes.forEach(res => {
+			const func = document.createElement("a")
+			func.className = "blue small"
+			func.innerHTML = " -- " + res.querySelector(".name").innerHTML
+			func.onclick = () => {
+				res.scrollIntoView()
+			}
+			div.append(func)
+		})
+	}
 
 	list.append(div)
 });
