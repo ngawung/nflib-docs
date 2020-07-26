@@ -1,4 +1,7 @@
 # Nightfox lib docs
+
+* [Click Here](https://ngawung.github.io/nflib-docs/)
+
 ini docs dari pdf nya nflib trus tak remake ke html biar enak baca nya... jadi ga susah2 nge scroll sana sini buat nyari refrensi hehe...
 
 ya gw tau kalo ada tool buat generate doc dari lib...
