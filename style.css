@@ -9,14 +9,14 @@ p {
     margin: 5px;
 }
 
+span {
+    font-weight: bold;
+}
+
 a, .name {
     text-decoration: none;
     color: hotpink;
     font-weight: bold;
-}
-.function {
-    padding: 10px;
-    border: 1px solid hotpink;
 }
 
 .function .name, .blue {
@@ -61,4 +61,30 @@ div {
     flex: 75%;
     overflow-y: scroll;
     height: 80vh;
+}
+
+.item {
+    margin-bottom: 30px;
+    border-bottom: 1px solid hotpink;
+}
+
+.item2 {
+    margin-bottom: 30px;
+    border-bottom: 1px solid mediumslateblue;
+}
+
+pre {
+	padding: 5px;
+	margin: 5px 0;
+	overflow: auto;
+	overflow-y: hidden;
+	font-size: 12px;
+	line-height: 20px;
+	background: #efefef;
+	border: 1px solid #777;
+}
+
+pre code {
+	padding: 10px;
+	color: #333;
 }
