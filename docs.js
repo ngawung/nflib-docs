@@ -270,12 +270,394 @@ const docs = [
 		]
 	},
 	{
-		name: "",
+		name: "#include “nf_text.h”",
 		description: ``,
 		function: [
 			{
-				name: "",
-				description: ``,
+				name: "NF_InitTextSys",
+				description: `void NF_InitTextSys(   u8 screen    // Screen (0 – 1)<br>                       );<br><br>Init the text engine for the selected screen.<br>You must init also the Tiled Bg’s system before use function of text engine.<br>You can get more info about it in the #include “nf_tiledbg.h” section for more info<br>about NF_InitTiledBgBuffers(); and NF_InitTiledBgSys(); functions.<br>Use this function also to reset text system.<br><br><br>Example:<br><br>NF_InitTextSys(1);<br><br>Init text engine for screen 1.`,
+			},
+			{
+				name: "NF_LoadTextFont",
+				description: `void NF_LoadTextFont( const char* file,     //   File name<br>                      const char* name,     //   Font name<br>                      u16 width,            //   Map width (in pixels)<br>                      u16 height,           //   Map height (in pixels)<br>                      u8 rotation           //   Rotation (0 – 2)<br>                      );<br><br>Load to RAM from FAT the font and palette files to can use later on a text layer.<br>You must specify the filename without extension and the name you wanna give to the font<br>and the size of the text layer you want to create, in pixels.<br>If the font includes the characters for rotated text. The values are 0: None, 1: Rotate<br>right, 2: Rotate left.<br>The font uses two files, the tileset with extension FNT and the palette with extension<br>PAL.<br>You must load the font for EVERY text layer you want to create.<br>Use this sheed to create your own fonts:<br><br><br><br><br>Example:<br><br>NF_LoadTextFont(“stage4/default”, “titulo”, 256, 256, 2);<br><br>Load the font with files “default” from “stage4” subfolder and call it “titulo”. The<br>rotation value “2” indicate you want to load only the characters rotated to the left.<br>The text layer created is of 32x32 tiles (256x256 pixels).<br>Every font loaded uses a tiled bg slot of RAM.`,
+			},
+			{
+				name: "NF_UnloadTextFont",
+				description: `void NF_UnloadTextFont(        const char* name         // Font name<br>                               );<br><br>Delete from RAM the font of name specified.<br><br>Example:<br><br>NF_UnloadTextFont(“titulo”);<br><br>Delete from RAM the font with name “titulo”.`,
+			},
+			{
+				name: "NF_CreateTextLayer",
+				description: `void NF_CreateTextLayer(       u8 screen,               //   Screen (0 – 1)<br>                               u8 layer,                //   Layer (0 – 3)<br>                               u8 rotation,             //   Rotation (0 – 2)<br>                               const char* name         //   Font name<br>                               );<br><br>Create a special tiled bg to can write text on it.<br>You must select the screen and layer where create the bg, the orientation of text and<br>the font you want to use.<br><br>Example:<br><br>NF_CreateTextLayer(1, 0, 2, “titulo”);<br><br>Create a text layer on the layer nº0 of screen nº1, using the font with name “titulo”<br>and with the text rotated to the left.`,
+			},
+			{
+				name: "NF_DeleteTextLayer",
+				description: `void NF_DeleteTextLayer(       u8 screen,      // Screen (0 – 1)<br>                               u8 layer        // Layer (0 – 3)<br>                               );<br><br>Delete a text layer.<br>You must specify the layer and screen of the text layer you want to delete.<br><br>Example:<br><br>NF_DeleteTextLayer(1, 0);<br><br>Delete the text layer of layer nº0 of the bottom screen.`,
+			},
+			{
+				name: "NF_WriteText",
+				description: `void NF_WriteText(    u8 screen,               //   Screen (0 – 1)<br>                      u8 layer,                //   Layer (0 – 3)<br>                      u8 x,                    //   Position X<br>                      u8 y,                    //   Position Y<br>                      const char* text         //   Text<br>                      );<br><br>Write a text on screen on the given coordinates. You must specify the screen and layer<br>where you want to put the text. The text it’s not wrote directly on the screen, insead,<br>it’s stored on a temporal buffer and it’s transferred to the screen when the function<br>NF_UpdateTextLayers(); is executed. This is for minimize the number of times the VRAM<br>it’s updated.<br>If you want to write variables or formated text, use the sprintf(); function and store<br>it before in a variable.<br><br>Example:<br><br>NF_WriteText(1, 0, 1, 1, “Hello World!”);<br><br>Send to temporal text buffer of bottom screen and layer nº 0 the text “Hello World!”<br><br><br>Example 2:<br><br>char text[32];<br>u16 myvar = 10;<br>sprintf(text, “Hello world %d times”, myvar);<br>NF_WriteText(1, 0, 1, 1, text);<br><br>Send to temporal text buffer of bottom screen and layer nº0 the text “Hello world 10<br>times” on coordinates x:1, y:1.`,
+			},
+			{
+				name: "NF_UpdateTextLayers",
+				description: `void NF_UpdateTextLayers(void);<br><br>Copy the temporal text buffer to VRAM of both screens.<br>Buffer it’s copied only if needed.<br><br>Example:<br><br>NF_UpdateTextLayers();<br><br>Copy, if needed the data from temporal text buffer to VRAM of both screens.`,
+			},
+			{
+				name: "NF_ClearTextLayer",
+				description: `void NF_ClearTextLayer(      u8 screen,     // Screen (0 – 1)<br>                             u8 layer       // Layer (0 – 3)<br>                             );<br><br>Cleans the contents of a layer text, writing 0 to all bytes.<br><br>Example:<br><br>NF_ClearTextLayer(0, 2);<br>Cleans the contents of text layer on screen 0, layer 2.`,
+			},
+			{
+				name: "NF_DefineTextColor",
+				description: `void NF_DefineTextColor(     u8   screen,   //   Screen (0 – 1)<br>                             u8   layer,    //   Layer (0 – 3)<br>                             u8   color,    //   Color number (0 – 15)<br>                             u8   r,        //   R value (0 – 31)<br>                             u8   g,        //   G value (0 – 31)<br>                             u8   b         //   B value (0 – 31)<br>                             );<br><br>Defines a RGB color to can be used later as text color. The color it’s stored on the<br>slot specified. To make this function works, the font palette must be indexed with 2<br>colors (Magenta/White).<br><br>Example:<br><br>NF_DefineTextColor(0, 0, 13, 15, 31, 15);<br><br>Defines the color numer 13 of layer text number 0 of top screen as light green.`,
+			},
+			{
+				name: "NF_SetTextColor",
+				description: `void NF_SetTextColor( u8 screen,    // Screen (0 – 1)<br>                      u8 layer,     // Layer (0 – 3)<br>                      u8 color      // Color (0 – 15)<br>                      );<br><br>Sets the color to use in all text wrote from this point. The text that’s already on<br>screen don’t be altered.<br><br>Example:<br><br>NF_SetTextColor(0, 0, 3);<br><br>From now, all text wrote on layer 0 of top screen will use the color stored on slot<br>number 3.`,
+			},
+		]
+	},
+	{
+		name: "#include “nf_text16.h”",
+		description: `Use the follow functions to use text with 8x16 pixel fonts. The normal text fuctions<br>still compatible and usable with this mode.`,
+		function: [
+			{
+				name: "NF_LoadTextFont16",
+				description: `void NF_LoadTextFont16();<br>As NF_LoadTextFont(); but for use with 8x16 pixel fonts.<br><br>You must load the font for EVERY text layer you want to create.<br>Use this sheed to create your own fonts:`,
+			},
+			{
+				name: "NF_CreateTextLayer16",
+				description: `void NF_CreateTextLayer16();<br>As NF_CreateTextLayer(); but for use with 8x16 pixels fonts.`,
+			},
+			{
+				name: "NF_WriteText16",
+				description: `void NF_WriteText16();<br>As NF_WriteText(); but for use in text layers with 8x16 pixels text fonts.`,
+			},
+			{
+				name: "NF_ClearTextLayer16",
+				description: `void NF_ClearTextLayer16();<br>As NF_ClearTextLayer();for use in text layers with 8x16 pixels text fonts.`,
+			},
+		]
+	},
+	{
+		name: "#include “nf_colision.h“",
+		description: ``,
+		function: [
+			{
+				name: "NF_InitCmapBuffers",
+				description: `void NF_InitCmapBuffers(void);<br><br>Init buffers to store colision map data.<br>You must use this function once in you code before load any colision map.<br>`,
+			},
+			{
+				name: "NF_ResetCmapBuffers",
+				description: `void NF_ResetCmapBuffers(void);<br><br>Reset colision map buffers, clearing all data on RAM. It’s usefull to use this function<br>on level change to easy clear all data before load the new one in just one fuction.`,
+			},
+			{
+				name: "NF_LoadColisionMap",
+				description: `void NF_LoadColisionMap(     const char* file,        //   Filename<br>                             u8 id,                   //   Slot number<br>                             u16 width,               //   Map width (in pixels)<br>                             u16 height               //   Map height (in pixels)<br>                             );<br><br>Load a colision map into ram in the specified slot. You must specify the width & height<br>of the map in pixels. Remember to make your colision map 8 pixels heighter of your<br>background and use this first row of tiles to define your tileset for colision map.<br>Use the “Convert_CMaps.bat” on GRIT folder to convert you maps. You only need to copy<br>the “.cmp” file.`,
+			},
+			{
+				name: "NF_UnloadColisionMap",
+				description: `void NF_UnloadColisionMap(u8 id);<br><br>Unload from RAM the colision map of specified slot.`,
+			},
+			{
+				name: "NF_GetTile",
+				description: `U16 NF_GetTile(u8 slot,      // Slot number<br>               u16 x,        // Position X in pixels<br>               u16 y         // Position Y in pixels<br>               );<br><br>Return the tile number (you must make your tileset in the first row of colision map) of<br>the given coordinates (in pixels) of the colision map in the slot number you has ben<br>selected.`,
+			},
+			{
+				name: "NF_SetTile",
+				description: `void NF_SetTile(      u8 slot,      //   Slot number<br>                      u16 x,        //   Position X in pixels<br>                      u16 y,        //   Position Y in pixels<br>                      u16 value     //   Value to write (0 – 16384)<br>                      );<br><br>Set the value of the tile on the position given of the colosion map loaded on the given<br>slot.`,
+			},
+			{
+				name: "NF_LoadColisionBg",
+				description: `void NF_LoadColisionBg(      const char* file,     //   File<br>                             u8 id,                //   Slot (0 – 31)<br>                             u16 width,            //   Background width<br>                             u16 height            //   Background height<br>                             );<br><br>Load a collision background into ram in the specified slot. You must specify the width &<br>height of the background in pixels. Remember to make your colision background 8 pixels<br>heighter of your real background and use this first row of tiles to define your color<br>tileset for colision background.<br>Use the “Convert_CMaps.bat” on GRIT folder to convert you maps. You need to copy the<br>“.cmp” & “.dat” files.`,
+			},
+			{
+				name: "NF_GetPoint",
+				description: `u8 NF_GetPoint(       u8 slot,      // Slot number (0 – 31)<br>                      s32 x,        // X coodinate in pixels<br>                      s32 y         // Y coordinate in pixels<br>                      );<br><br>Returns the color number (0 – 255) from the pixel of collision background specified.<br>If coordinates are outside the background, returns 0.`,
+			},
+		]
+	},
+	{
+		name: "#include “nf_sound.h”",
+		description: ``,
+		function: [
+			{
+				name: "NF_InitRawSoundBuffers",
+				description: `void NF_InitRawSoundBuffers(void);<br><br>Init all buffers and variables to can load and use sound files in RAW format. You must<br>use this function once before load or use any sound in RAW format. Remember to init DS<br>sound engine using soundEnable(); Libnds command.`,
+			},
+			{
+				name: "NF_ResetRawSoundBuffers",
+				description: `void NF_ResetRawSoundBuffers(void);<br><br>Reset all sound buffers and clears the data on them. It’s usefull when you change a<br>level in game, etc.`,
+			},
+			{
+				name: "NF_LoadRawSound",
+				description: `void NF_LoadRawSound( const char* file,        //   Filename<br>                      u16 id,                  //   Slot where sound will be stored (0 – 31)<br>                      u16 freq,                //   Sample frequency (en Hz)<br>                      u8 format                //   Sample format (0 – 2)<br>                      );<br><br>Load a RAW file from FAT or EFS to RAM. You must pass to the fuction the filename<br>(without extension), the slot number to where store it (0 – 31), the frequency of the<br>sample (in Hz, 11025, 22050), and the sample format (0 - > 8 bits, 1 - > 16 bits, 2 -><br>ADPCM).<br><br>Example:<br><br>NF_LoadRawSound("music", 1, 22050, 0);<br><br>Load the file “music.raw” on slot nº1. This file it’s encoded in 22050hz and 8 bits.<br><br>To convert sound files to “RAW” format i use the free program “Switch”<br>http://www.nch.com.au/switch/plus.html. The best parameters for “RAW” files on DS are, 8<br>bits signed at 11025hz o 22050hz. And remember in “Mono”.`,
+			},
+			{
+				name: "NF_UnloadRawSound",
+				description: `void NF_UnloadRawSound(u8 id);<br><br>Deletes from RAM the sound file stored in the slot specified (0 - 31).`,
+			},
+			{
+				name: "NF_PlayRawSound",
+				description: `u8 NF_PlayRawSound(   u8 id,          //   Slot number of sound to play<br>                      u8 volume,      //   Volume (0 – 127)<br>                      u8 pan,         //   Pan (0 – 64 – 127)<br>                      bool loop,      //   Loop ? (true / false)<br>                      u16 loopfrom    //   Loop start point<br>                      );<br><br>Play the sound file loaded on the slot specified. You must specify too the volume, pan,<br>and if you want to loop the sound, if true, you must set also the sample number where<br>loop starts.<br>This fuction also returns the channel number asigned to the playback.<br>Example:<br><br>NF_PlayRawSound(1, 127, 64, true, 0);<br><br>Play the sound stored on slot number 1, with full volume (127), pan centered (64), with<br>loop enabled from first sample.`,
+			},
+		]
+	},
+	{
+		name: "Sound Extra",
+		description: `You can use the rest of Libnds sound fuctions for pause, stop, volume, because they are<br>easy enough.<br><br>http://libnds.devkitpro.org/a00099.html`,
+	},
+	{
+		name: "#include “nf_bitmapbg.h”",
+		description: ``,
+		function: [
+			{
+				name: "NF_Init16bitsBgBuffers",
+				description: `void NF_Init16bitsBgBuffers(void);<br><br>Inits the buffers for 16 bits backgrounds.<br>Use this function 1 time before use any buffer.`,
+			},
+			{
+				name: "NF_Reset16bitsBgBuffers",
+				description: `void NF_Reset16bitsBgBuffers(void);<br><br>Resets 16 bits buffer and cleans the RAM contens. Usefull to ensure the data it’s<br>deleted from RAM on stage changes, etc.`,
+			},
+			{
+				name: "NF_Init16bitsBackBuffer",
+				description: `void NF_Init16bitsBackBuffer( u8 screen      // Screen (0 – 1)<br>                              );<br><br>Inits the 16 bits backbuffer of the selected screen. Use this function one time before<br>use the backbuffer.`,
+			},
+			{
+				name: "NF_Enable16bitsBackBuffer",
+				description: `void NF_Enable16bitsBackBuffer(       u8 screen     // Screen (0 – 1)<br>                              );<br><br>Enables backbuffer for the selected screen. If the backbuffer it’s alerady enabled, the<br>contents it’s deleted.`,
+			},
+			{
+				name: "NF_Disble16bitsBackBuffer",
+				description: `void NF_Disble16bitsBackBuffer(       u8 screen     // Screen (0 – 1)<br>                              );<br><br>Disables the backbuffer of selected screen, erasing the contents of it and frees the RAM<br>used (128kb);`,
+			},
+			{
+				name: "NF_Flip16bitsBackBuffer",
+				description: `void NF_Flip16bitsBackBuffer( u8 screen      // Screen (0 – 1)<br>                              );<br><br>Sends the contents of Backbuffer to the VRAM of selected screen, showing the image<br>stored on it.`,
+			},
+			{
+				name: "NF_InitBitmapBgSys",
+				description: `void NF_InitBitmapBgSys(     u8 screen,      // Screen (0 – 1)<br>                             u8 mode         // Color mode (0 – 1)<br>                             );<br><br>Inits the screen specified in “bitmap” mode, with the color deep given (8 or 16 bits).<br>DS 2D engine must be set at mode 5.<br>0 – 8 bits (256 colors)<br>1 – 16 bits<br><br>Example:<br><br>NF_InitBitmapBgSys(0, 1);<br><br>Sets top screen in “bitmap” mode with 16 bits color deep.`,
+			},
+			{
+				name: "NF_Load16bitsBg",
+				description: `void NF_Load16bitsBg( const char* file,       // File<br>                      u8 slot                 // Slot number (0 – 15)<br>                      );<br><br>Loads from FAT or EFS a 16 bits image file in binary format (*.img) with 256x256 pixeles<br>max size (128kb). You must convert the file using this GRIT command line:<br><br>grit.exe file.ext -gb -gB16 –ftb<br><br>You can load the amount of files defined on #define NF_SLOTS_BG16B.<br><br>Example:<br><br>NF_Load16bitsBg("bmp/bitmap16", 0);<br><br>Loads “bitmap16.img” file on the slot number 0.`,
+			},
+			{
+				name: "NF_Unload16bitsBg",
+				description: `void NF_Unload16bitsBg(         u8 slot       // Slot (0 – 15)<br>                      );<br><br>Deletes from RAM the image stored on the selected slot.<br><br>Example:<br><br>NF_Unload16bitsBg(0);<br><br>Deletes from RAM the image stored in slot 0. It’s usefull when you has ben copied the<br>image to the backbuffer or VRAM and no need it longer on RAM.`,
+			},
+			{
+				name: "NF_Copy16bitsBuffer",
+				description: `void NF_Copy16bitsBuffer(       u8 screen,           // Screen (0 – 1)<br>                                u8 destination,      // Destination (0 – 1)<br>                                u8 slot              // Slot (0 – 15)<br>                                );<br><br>Copy the image of selected slot to VRAM or BackBuffer of selected screen. As<br>destination, set 0 for VRAM or 1 for BackBuffer.<br><br>Example:<br><br>NF_Copy16bitsBuffer(0, 1, 0);<br><br>Copy the image of slot 0 to the BackBuffer of top screen.`,
+			},
+			{
+				name: "NF_Init8bitsBgBuffers",
+				description: `void NF_Init8bitsBgBuffers(void);<br><br>Inits the buffers for 8 bits backgrounds.<br>Use this function 1 time before use any buffer.`,
+			},
+			{
+				name: "NF_Reset8bitsBgBuffers",
+				description: `void NF_Reset8bitsBgBuffers(void);<br><br>Resets 8 bits buffer and cleans the RAM contens. Usefull to ensure the data it’s deleted<br>from RAM on stage changes, etc.`,
+			},
+			{
+				name: "NF_Load8bitsBg",
+				description: `void NF_Load8bitsBg(   const char* file,       // File<br>                       u8 slot                 // Slot number (0 – 15)<br>                       );<br><br>Loads from FAT or EFS a 8 bits image file in binary format (*.img) with 256x256 pixeles<br>max size (64kb) and his palette (*.pal). You must convert the file using this GRIT<br>command line:<br><br>grit.exe file.ext -gb -gB16 –ftb<br><br>or if you need to share the palette with other background<br><br>grit.exe file.ext -gb -gu8 -gB8 -pu16 -pS -ftb -fh! -Omypal.pal -gTFF00FF<br><br><br>If you want to display 2 backgrouns on same screen, they must share the palette.<br>You can load the amount of files defined on #define NF_SLOTS_BG8B.<br><br>Example:<br><br>NF_Load8bitsBg("bmp/bitmap8", 0);<br><br>Loads “bitmap8.img” and “bitmap8.pal” files on the slot number 0.`,
+			},
+			{
+				name: "NF_Unload8bitsBg",
+				description: `void NF_Unload8bitsBg( u8 slot          // Slot (0 – 15)<br>                       );<br><br>Deletes from RAM the image stored on the selected slot.<br><br>Example:<br><br>NF_Unload8bitsBg(0);<br><br>Deletes from RAM the image stored in slot 0. It’s usefull when you has ben copied the<br>image to the backbuffer or VRAM and no need it longer on RAM.`,
+			},
+			{
+				name: "NF_Copy8bitsBuffer",
+				description: `void NF_Copy8bitsBuffer(         u8 screen,           // Screen (0 – 1)<br>                                 u8 destination,      // Destination (0 – 2)<br>                                 u8 slot              // Slot (0 – 15)<br>                                 );<br><br>Copy the image of selected slot to VRAM or BackBuffer of selected screen. As<br>destination, set 0 for VRAM layer 2, 1 for VRAM layer 3 or 2 for BackBuffer.<br><br>Example:<br><br>NF_Copy8bitsBuffer(0, 1, 0);<br><br>Copy the image of slot 0 to the layer 3 of top screen.`,
+			},
+			{
+				name: "NF_Init8bitsBackBuffer",
+				description: `void NF_Init8bitsBackBuffer( u8 screen         // Screen (0 – 1)<br>                             );<br><br>Inits the 8 bits backbuffer of the selected screen. Use this function one time before<br>use the backbuffer.`,
+			},
+			{
+				name: "NF_Enable8bitsBackBuffer",
+				description: `void NF_Enable8bitsBackBuffer(      u8 screen          // Screen (0 – 1)<br>                              );<br><br>Enables backbuffer for the selected screen. If the backbuffer it’s alerady enabled, the<br>contents it’s deleted.`,
+			},
+			{
+				name: "NF_Disble8bitsBackBuffer",
+				description: `void NF_Disble8bitsBackBuffer(      u8 screen          // Screen (0 – 1)<br>                              );<br><br>Disables the backbuffer of selected screen, erasing the contents of it and frees the RAM<br>used (64kb);`,
+			},
+			{
+				name: "NF_Flip8bitsBackBuffer",
+				description: `void NF_Flip8bitsBackBuffer( u8 screen,                // Screen (0 – 1)<br>                             u8 destination            // Destination layer (0 – 1)<br>                             );<br><br>Sends the contents of Backbuffer to the VRAM of selected screen, showing the image<br>stored on it. You can send it to Layer 2 (0) or Layer 3 (1).`,
+			},
+			{
+				name: "NF_Load16bitsImage",
+				description: `void NF_Load16bitsImage(     const char* file,         //   File<br>                             u8 slot,                  //   Slot (0 – 15)<br>                             u16 size_x,               //   Image width (256 max)<br>                             u16 size_y                //   Image height (256 max)<br>                             );<br><br>Loads a 16 bits image (*.img) with max size of 256x256 pixels, into a RAM slot. You<br>must specify also the size if the image. The image will load into 16 bits bg slot.<br>Use NF_Unload16bitsBg(); function to remove it from RAM.<br><br>Example:<br><br>NF_Load16bitsImage(“bmp/character”, 1, 64, 128);<br><br>Loads the “character” file into slot nº 1. The image has a size of 64 x 128 pixels.`,
+			},
+			{
+				name: "NF_Draw16bitsImage",
+				description: `void NF_Draw16bitsImage(     u8 screen,       //   Screen (0 – 1)<br>                             u8 slot,         //   Slot (0 – 15)<br>                             s16 x,           //   Position X<br>                             s16 y            //   Position Y<br>                             bool alpha       //   Color 0xFF00FF transparent?<br>                             );<br><br>Draws the image loaded in the selected slot into the backbuffer of selected screen on<br>the specified coordinates. If “alpha” is set to true, all pixels with 0xFF00FF (magenta)<br>color are not draw.<br><br>Example:<br><br>NF_ Draw16bitsImage(1, 1, 100, 50, true);<br><br>Draws the image stored into Slot nº1 in the backbuffer of bottom screen, in the<br>coordinates x:100, y:50.`,
+			},
+		]
+	},
+	{
+		name: "#include “nf_media.h”",
+		description: ``,
+		function: [
+			{
+				name: "NF_LoadBMP",
+				description: `void NF_LoadBMP(      const char* file,     // File<br>                      u8 slot               // 16 bits slot to put image<br>                      );<br><br>Loads a 8, 16 o 24 bits BMP image into a 16 bits image slot. To load and show the image,<br>you must init 16 bits mode, the backbuffers and use the NF_Draw16bitsImage(); to send<br>the image from RAM slot to the BackBuffer. All pixels placed out of screen, are just<br>ignored.<br><br>Example:<br><br>NF_LoadBMP(“bmp/lostend”, 0);<br><br>Loads “lostend.bmp” file into 16 bits slot nº 0.`,
+			},
+		]
+	},
+	{
+		name: "#include “nf_affine.h”",
+		description: ``,
+		function: [
+			{
+				name: "NF_InitAffineBgSys",
+				description: `void NF_InitAffineBgSys(     u8 screen        // Screen (0 – 1)<br>                             );<br><br>Initializes the "Affine" (rotation and scaling) background system for the selected<br>screen. This mode is exclusive, you can only use affine backgrounds once this mode is<br>initialized and only on layers 2 and 3. Besides these backgrounds can not be more than<br>256 tiles each and must share the palette, with a maximum of 256 colors. The 2D engine<br>must be initialized in mode 2.<br><br>Example:<br><br>NF_InitAffineBgSys(0);<br><br>Initializes Affine mode for the top screen.`,
+			},
+			{
+				name: "NF_LoadAffineBg",
+				description: `void NF_LoadAffineBg( const char* file,       //   File<br>                      const char* name,       //   Background name<br>                      u16 width,              //   Width in pixeles<br>                      u16 height              //   Height en pixeles<br>                      );<br><br>Load a "affine" background in RAM from the FAT or NitroFS. It is essential to initialize<br>the tiled backgrounds buffers before load any "affine" background. See the section<br>#include "nf_tiledbg.h" for more information about the NF_InitTiledBgBuffers();<br>function.<br>The "affine" backgrounds has to be 256x256 or 512x512 pixels size and a maximum tileset<br>of 256 tiles. All backgrounds for the same screen must share the palette. Use the<br>Convert_Affine.bat bat in the GRIT folder to convert your backgrounds.<br><br>Example:<br><br>NF_LoadAffineBg(bg/waves512", "waves", 512, 512);<br><br>Load the "waves512" background from bg folder, name it as "waves" and specifies that the<br>background is 512 x 512 pixels.`,
+			},
+			{
+				name: "NF_UnloadAffineBg",
+				description: `void NF_UnloadAffineBg(      const char* name          // Background name<br>                             );<br><br>Deletes the specified affine background from RAM. It is a simple call to the<br>NF_UnloadTiledBg(); function.<br><br>Example:<br><br>NF_UnloadAffineBg("waves") deletes the background "waves" from RAM.`,
+			},
+			{
+				name: "NF_CreateAffineBg",
+				description: `void NF_CreateAffineBg(      u8 screen,                       //   Screen (0 -1)<br>                             u8 layer,                        //   Layer (2 – 3)<br>                             const char* name,                //   Name<br>                             u8 wrap                          //   Wrap (0 – 1)<br>                             );<br><br>Creates an affine background in the screen and layers specified, using the preloaded<br>graphics in RAM. Specify if you want the background infinite (Wrap 1) or not (Warp 0).<br><br>Example:<br><br>NF_CreateAffineBg (0, 3, "waves", 1);<br><br>Create a background on screen 0, Layer 3, using the background graphics "waves", with<br>the option "wrap arround” enabled.`,
+			},
+			{
+				name: "NF_DeleteAffineBg",
+				description: `void NF_DeleteAffineBg(      u8 screen,         // Screen (0 – 1)<br>                             u8 layer           // Layer (2 – 3)<br>                             );<br><br>Deletes from VRAM the background of the screen and layer specified.<br><br>Example:<br><br>NF_DeleteAffineBg(0, 3);<br><br>Delete the background of the top screen in layer 3.`,
+			},
+			{
+				name: "NF_AffineBgTransform",
+				description: `void NF_AffineBgTransform(   u8 screen,         //   Screen (0 – 1)<br>                             u8 layer,          //   Layer (2 – 3)<br>                             s32 x_scale,       //   Scale X (0 – 256 - >512)<br>                             s32 y_scale,       //   Scale Y (0 – 256 - >512)<br>                             s32 x_tilt,        //   Tilt X (0 – >512)<br>                             s32 y_tilt         //   Tilt Y (0 – >512)<br>                             );<br><br>Modify the transformation matrix of the specified background with given parameters. You<br>can change the scale on the axes X and Y, as well as the inclination of these axes.<br><br>Example:<br><br>NF_AffineBgTransform(0, 3, 512, 512, 0, 0);<br><br>Zoom the bottom screen background on Layer 3, to the 50% of its size.`,
+			},
+			{
+				name: "NF_AffineBgMove",
+				description: `void NF_AffineBgMove( u8 screen,       //   Screen (0 – 1)<br>                      u8 layer,        //   Layer (2 – 3)<br>                      s32 x,           //   Position X<br>                      s32 y,           //   Position Y<br>                      s32 angle        //   Rotacion angle (-2048 / 2048)<br>                      );<br><br>Moves the Affine background to the position specified. You can also specify the rotation<br>of this background (between -2048 to 2048). Affine backgrounds can’t be moved with<br>NF_ScrollBg(); function.<br><br>Example:<br><br>NF_AffineBgMove(0, 3, 128, 96, 256);<br><br>Move the background of the top screen in the layer 3 at coordinates x128, Y96 and rotate<br>45 degrees to the right.`,
+			},
+			{
+				name: "NF_AffineBgCenter",
+				description: `void NF_AffineBgCenter(      u8 screen,         //   Screen (0 – 1)<br>                             u8 layer,          //   Layer (2 – 3)<br>                             s32 x,             //   Position X<br>                             s32 y              //   Position Y<br>                             );<br><br>Define the center of rotation of the affine background specified.<br><br>Example:<br><br>NF_AffineBgCenter(0, 3, 128, 128);<br><br>Define the center of rotation of the top screen, layer 3 affine background at<br>coordinates x128, and 128.`,
+			},
+		]
+	},
+	{
+		name: "#include “nf_3d.h”",
+		description: ``,
+		function: [
+			{
+				name: "NF_Set3D",
+				description: `void NF_Set3D( u8 screen,    // Screen (0 – 1)<br>               u8 mode       // Mode (0, 2, 5)<br>               );<br><br>Init 3D mode for the selected screen.<br><br> Mode          Configuration<br>------        -------------------------------------<br>0             Tiled Bg’s at 256 colors.<br>2             Affine Bg’s of 8 bits in layers 2 & 3<br>5             Bitmap Bg’s at 8 or 16 bits.<br><br>3D objets are rendered in layer 0. If you set screen 1 for 3D, screen numbers for 2D<br>gets inverted, soo top screen it’s 1 and bottom screen 0.<br>You must use this function before use 3dSprites.<br><br><br>Example:<br><br>NF_Set3D(1, 0);<br><br>Init 3D mode for Tiled Bg’s and Sprites on screen 1 (bottom)`,
+			},
+			{
+				name: "NF_InitOpenGL",
+				description: `void NF_InitOpenGL(void);<br><br>Initialitzes and configures OpenGL for 3dSprites functions of the lib.<br>NF_Init3dSpriteSys(); automaticaly calls it. Soo you never use this.`,
+			},
+		]
+	},
+	{
+		name: "#include “nf_sprite3d.h”",
+		description: `These functions are special, since it uses the 3D engine to create sprites with textured<br>polygons. Can only be used on a screen at the same time, we lose the background layer 0,<br>but in return we can create up to 256 sprites of a maximum size of 1024x1024, can use<br>any size in base 2, and use a maximum of 32 palettes simultaneously.<br>For the loading of graphics and palettes, use the same functions as 2D sprites.<br>You can convert indexed images of 256 colors to create textures for the 3dSprites with<br>the following grit command:<br><br>grit.exe imagen.bmp -gb -gu8 -gB8 -pu8 -ftb -fh! -gTFF00FF<br><br>Or use the convert bats of 8bits images<br>`,
+		function: [
+			{
+				name: "NF_Init3dSpriteSys",
+				description: `void NF_Init3dSpriteSys();<br><br>Init 3dSprite system.<br>Asign 128kb of VRAM for textures and 16 kb for palettes.<br>Enable extended palettes.<br><br>Example:<br><br>NF_Init3dSpriteSys();<br><br>Init the 3dSprites engine.`,
+			},
+			{
+				name: "NF_Vram3dSpriteGfx",
+				description: `void NF_Vram3dSpriteGfx(u16 ram,            // Gfx RAM slot (0 – 255)<br>                      u16 vram,             // Gfx VRAM slot (0 – 255)<br>                      bool keepframes       // Copy only the first frame?<br>                      );<br><br>Copy a Gfx from RAM to VRAM, to can use it later on 3dSprite. You must indicate the<br>origin slot on RAM (0 – 255), the destination slot on VRAM (0 – 255), and if it’s<br>animated one, if you want to copy all frames to VRAM (false) or just the first one<br>(true).<br><br>Example:<br><br>NF_Vram3dSpriteGfx(160, 23, false);<br><br>Copy the Gfx stored on the slot nº160 of RAM to the slot nº23 of VRAM, copying all<br>frames if it’s animated.`,
+			},
+			{
+				name: "NF_Free3dSpriteGfx",
+				description: `void NF_Free3dSpriteGfx(u16 id              // VRAM slot (0 – 255)<br>                      );<br><br>Delete from VRAM the Gfx of selected slot.<br>You must don’t delete the Gfx if a sprite it’s using it, may cause sprite appears<br>corrupted of turns invisible.<br><br>Example:<br><br>NF_Free3dSpriteGfx(34);<br><br>Delete from VRAM the gfx on slot nº34.`,
+			},
+			{
+				name: "NF_VramSpriteGfxDefrag",
+				description: `void NF_VramSpriteGfxDefrag();<br><br>Defrags the free VRAM used for sprites gfx. This function is automaticaly executed when<br>fragmented free VRAM it’s bigger in 50% of total free VRAM. You don’t need to execute<br>this command manualy never. You can get the state of VRAM reading those variables:<br><br>NF_TEXVRAM.free                <-   Total VRAM free<br>NF_TEXVRAM.fragmented          <-   Fragmented free VRAM<br>NF_TEXVRAM.inarow              <-   Largest free block of VRAM at the end<br>NF_TEXVRAM.lost                <-   unusable free VRAM because fragmentation.`,
+			},
+			{
+				name: "NF_Vram3dSpritePal",
+				description: `void NF_Vram3dSpritePal(       u8 id,          // RAM slot of palette (0 – 64)<br>                               u8 slot         // VRAM slot of palette (0 – 31)<br>                               );<br><br>Copy the palette from RAM to the SLOT of extended palettes on VRAM. If slot it’a already<br>in use, the contents it’s overwrited.<br><br>Example:<br><br>NF_VramSpritePal(56, 8);<br><br>Copy the palette from RAM slot nº56 to the extended palettes slot nº8.`,
+			},
+			{
+				name: "NF_Create3dSprite",
+				description: `void NF_Create3dSprite(        u8 id,          //   Sprite Id (0 – 255)<br>                               u16 gfx,        //   Gfx slot (0 – 255)<br>                               u8 pal,         //   Palette slot (0 – 31)<br>                               s16 x,          //   X coordinate<br>                               s16 y           //   Y coordinate<br>                               );<br><br>Create a sprite with the Id (0 - 255) given on the screen, using the Gfx and palette of<br>selected slots. You must select also the coordinates where the sprite is created.<br><br>Example:<br><br>NF_Create3dSprite(12, 30, 1, 100, 50);<br><br>Create a sprite on screen , with the id nº12, using the gfx stored on the slot nº30 of<br>VRAM and the palette from slot nº1. The sprite is created on the coordinates x:100, y:50`,
+			},
+			{
+				name: "NF_Delete3dSprite",
+				description: `void NF_Delete3dSprite(u8 id);<br><br>Delete from screen the sprite of Id selected. The Gfx and palette used by the sprited<br>will not be deleted from VRAM.<br><br>Example:<br><br>NF_Delete3dSprite(12);<br><br>Delete from screen the sprite with id nº12.`,
+			},
+			{
+				name: "NF_Sort3dSprites",
+				description: `void NF_Sort3dSprites(void);<br><br>Sorts the draw order of created 3dSprites by his ID. The lowest ID has priority.<br>void NF_Set3dSpritePriority( u16 id,          // Sprite ID (0 – 255)<br>                             u16 prio         // Priority (0 – 255)<br>                             );<br><br>Changes the draw priority of the 3dSprite with selected ID. The lowest ID number mean<br>the highest priority.`,
+			},
+			{
+				name: "NF_Swap3dSpritePriority",
+				description: `void NF_Swap3dSpritePriority( u16 id_a,       // Sprite ID A<br>                              u16 id_b        // Sprite ID B<br>                              );<br><br>Swaps the priority between two 3dSprites.`,
+			},
+			{
+				name: "NF_Move3dSprite",
+				description: `void NF_Move3dSprite( u8 id,           // Id. of Sprite (0 – 255)<br>                      s16 x,           // Position X<br>                      s16 y            // Position Y<br>                      );<br><br>Move a 3dSprite to the position specified.<br><br>Example:<br><br>NF_Move3dSprite(35, 100, 50);<br><br>Moves the 3dSprite nº35 to the coordinates x:100, y:50`,
+			},
+			{
+				name: "NF_Show3dSprite",
+				description: `void NF_Show3dSprite( u8 id,           // Id. of Sprite (0 – 255)<br>                      bool show        // Visivility<br>                      );<br><br>Show or hides a 3dSprite. If you hide it, 3dSprite just becomes invisible, without<br>delete it.<br><br>Example:<br><br>NF_Show3dSprite(35, false);<br><br>Hides the 3dSprite nº35.<br><br>NF_Show3dSprite(45, true);<br><br>Makes visible the 3dSprite nº45.`,
+			},
+			{
+				name: "NF_Set3dSpriteFrame",
+				description: `void NF_Set3dSpriteFrame(       u8 id,        // Id. of Sprite (0 – 255)<br>                                u8 frame      // Frame<br>                                );<br><br>Selects what frame of an animation has to show the 3dSprite.<br><br>Example<br><br>NF_Set3dSpriteFrame(20, 5);<br><br>Sprite nº20 shows the frame nº5.`,
+			},
+			{
+				name: "NF_Draw3dSprites",
+				description: `void NF_Draw3dSprites(void);<br><br>Draws on the screen all created 3dSprites.<br>You need to do this one time per frame to display created 3dSprites.<br><br>This is the basic code to show them:<br><br>// Draw all 3D Sprites<br>NF_Draw3dSprites();<br>// Update 3D scenario, if not, nothing on the screen<br>glFlush(0);<br>// Wait for vertical sync<br>swiWaitForVBlank();`,
+			},
+			{
+				name: "NF_Update3dSpritesGfx",
+				description: `void NF_Update3dSpritesGfx(void);<br><br>Update if needed the textures for animated 3dSprites.<br>Use this if any of your 3dSprites has the flag KEEPFRAMES == TRUE.<br>Put this function just after swiWaitForVBlank();`,
+			},
+			{
+				name: "NF_Rotate3dSprite",
+				description: `void NF_Rotate3dSprite(          u16   id,          //   Sprite ID (0 – 255)<br>                                 s16   x,           //   Rotacion X (-512/0/512)<br>                                 s16   y,           //   Rotacion Y (-512/0/512)<br>                                 s16   z            //   Rotacion Z (-512/0/512)<br>                                 );<br><br>Rotates the 3dSprite over the 3 axis. You can set a rotation between -512 y 512,<br>becoming 0 the central point (no rotation).`,
+			},
+			{
+				name: "NF_Scale3dSprite",
+				description: `void NF_Scale3dSprite( u16 id,               // Sprite ID<br>                       u16 x,                // X scale (0/64/512)<br>                       u16 y                 // Y scale (0/64/512)<br>                       );<br><br>Scales 3dSprite over X & Y axis. Scaling range goes from 0 to 512, 64 equals to 100%<br>scale.`,
+			},
+			{
+				name: "NF_Blend3dSprite",
+				description: `void NF_Blend3dSprite( u8 sprite,            // Sprite ID (0 – 255)<br>                       u8 poly_id,           // Polygon ID (1 – 62)<br>                       u8 alpha              // Transparency (0 – 31)<br>                       );<br><br>Enable and change the level of alpha of the 3D sprite indicated. For transparency to be<br>effective among Sprites, you must specify a different poly_id for each sprite (between 1<br>and 62). The alpha range is from 0 to 31, 31 means opaque. To remove the transparency,<br>select a value 31 for alpha or set poly_id to 0.`,
+			},
+			{
+				name: "NF_3dSpritesLayer",
+				description: `void NF_3dSpritesLayer(          u8 layer           // Layer<br>                                 );<br><br>Select the layer to draw the 3D Sprites. (0 - 3)<br>3dSprites actually always drawn on Layer 0, this function only changes the priority of<br>this layer on the other.`,
+			},
+			{
+				name: "NF_3dSpriteEditPalColor",
+				description: `void NF_3dSpriteEditPalColor( u8   pal,          //   Palette (0 – 31)<br>                              u8   number,       //   Color number (0 – 255)<br>                              u8   r,            //   Value for R (0 – 31)<br>                              u8   g,            //   Value for G (0 – 31)<br>                              u8   b             //   Value for B (0 – 31)<br>                              );<br><br>Changes the value of one color on one the sprites palete of screen specified. The change<br>is made over the RAM copy of the palette, soo you dont see any change until you update<br>it on VRAM with NF_3dSpriteUpdatePalette(); function. Use this function to make cool<br>effect on your Sprites.<br><br>Example:<br><br>NF_3dSpriteSetPalColor(3, 1, 31, 0, 0);<br><br>Change the value of color nº1 of the palette nº3 to red.`,
+			},
+			{
+				name: "NF_3dSpriteUpdatePalette",
+				description: `void NF_3dSpriteUpdatePalette(          u8 pal            // Palette (0 – 31)<br>                                        );<br><br>Updates on VRAM the sprites palette specified with the RAM copy of it.<br><br>Example:<br><br>NF_3dSpriteUpdatePalette(2);<br><br>Updates the palette nº2.`,
+			},
+			{
+				name: "NF_3dSpriteGetPalColor",
+				description: `void NF_3dSpriteGetPalColor( u8 pal,             //   Pal (0 – 31)<br>                             u8 number,          //   Color number   (0 – 255)<br>                             u8* r,              //   R value (0 –   31)<br>                             u8* g,              //   G value (0 –   31)<br>                             u8* b               //   B value (0 –   31)<br>                      );<br><br>Gets the RGB value of one color from sprites palette loaded on RAM from screen<br>specified.<br><br>Example:<br><br>u8 red;<br>u8 green;<br>u8 blue;<br>NF_3dSpriteGetPalColor(3, 200, &red, &green, &blue);<br><br>Gets the RGB value of color number 200 from sprites palette number 3 and store it into<br>“red”, “green” and “blue” variables`,
+			},
+			{
+				name: "NF_3dSpriteSetDeep",
+				description: `void NF_3dSpriteSetDeep(       u8 id,            // Sprite ID (0 – 255)<br>                               s16 z             // Deep (-512/0/512)<br>                               );<br><br>Sets the depth in the Z axis for selected 3dSprite, -512 being the closest point, 0 is<br>the default and 512 the furthest point. Change the Sprite’s depth is to prevent the<br>intersection with other sprites when rotation or zoom it’s applied. Change the depth of<br>Sprite also alters the priority it has on screen.`,
+			},
+		]
+	},
+	{
+		name: "#include “nf_mixedbg.h”",
+		description: ``,
+		function: [
+			{
+				name: "NF_InitMixedBgSys",
+				description: `void NF_InitMixedBgSys(u8 screen);   // Screen (0 – 1)<br><br>Init mixed background mode (Tiled BG + Bitmap 8 bits)<br>Layer 0 a 2 – Tiled (64kb, 48kb for tiles, 16kb for mapas).<br>Layer 3 - Bitmap 8 bits (64kb).<br>You can use all functions of both background modes.`,
 			},
 		]
 	},
